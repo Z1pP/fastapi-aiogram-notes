@@ -12,4 +12,4 @@ class TagCreate(TagBase):
 
 class TagResponse(TagBase):
     create_at: datetime
-    updated_at: datetime
+    update_at: datetime
