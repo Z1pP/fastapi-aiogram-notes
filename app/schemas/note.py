@@ -12,7 +12,7 @@ class NoteBase(BaseModel):
 
 class NoteCreate(NoteBase):
     user_id: int
-    tags: list[str]
+    tags: list[str] = None
 
 
 class NoteResponse(NoteBase):
