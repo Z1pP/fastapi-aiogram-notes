@@ -4,6 +4,7 @@ from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
+from app.exceptions.exceptions import UserAlreadyExistsException
 from app.schemas import UserResponse, UserCreate
 from app.services import UserService
 
@@ -20,4 +21,10 @@ async def get_users(session: AsyncSession = Depends(get_session)):
 @router.post('/create', response_model=UserResponse)
 async def create_user(user: UserCreate, session: AsyncSession = Depends(get_session)):
     user_seкvice = UserService(session)
-    return await user_seкvice.create_user(user)
+    try:
+        return await user_seкvice.create_user(user)
+    except UserAlreadyExistsException as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+#@router.get("/{user_id}", response_model=UserResponse)
