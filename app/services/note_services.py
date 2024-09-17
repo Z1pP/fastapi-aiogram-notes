@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.exceptions.exceptions import UserNotFoundException
+from app.exceptions.exceptions import NoteNotFoundException, UserNotFoundException
 from app.schemas.note import NoteCreate, NoteResponse
 from app.models import Tag, Note
 from .user_services import UserService
@@ -52,3 +52,12 @@ class NoteService:
         result = await self.session.execute(query)
         notes = result.scalars().unique().all()
         return notes
+    
+    async def delete_note(self, note_id: int) -> None:
+        query = select(Note).where(Note.id == note_id)
+        result = await self.session.execute(query)
+        note = result.scalar_one_or_none()
+        if not note:
+            raise NoteNotFoundException()
+        await self.session.delete(note)
+        await self.session.commit()
