@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from app.api.v1.user import router as user_router
 from app.api.v1.note import router as note_router
 
-app = FastAPI(docs_url="/api")
+app = FastAPI(docs_url="/api", openapi_prefix="/api/v1")
 app.include_router(user_router)
 app.include_router(note_router)
 
