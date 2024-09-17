@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models.user import User
 from app.schemas.user import UserResponse, UserCreate
 
@@ -11,7 +12,12 @@ class UserService:
         self.session = session
     
     async def create_user(self, user: UserCreate) -> UserResponse:
+        db_user = await self.get_user_by_email(user)
+        if db_user:
+            raise UserAlreadyExistsException(user.email)
+        
         hashed_password = user.password
+
         db_user = User(**user.model_dump(exclude="password"), hashed_password=hashed_password)
         self.session.add(db_user)
 
@@ -32,3 +38,14 @@ class UserService:
         result = await self.session.execute(select(User).options(selectinload(User.notes)))
         users = result.scalars().all()
         return users
+    
+    async def get_user_by_id(self, user_id: int) -> UserResponse:
+        result = await self.session.execute(select(User).where(User.id == user_id).options(selectinload(User.notes)))
+        user = result.scalar_one_or_none()
+        if user is None:
+            raise UserNotFoundException()
+        return user
+    
+    async def get_user_by_email(self, user: UserCreate) -> UserResponse:
+        result = await self.session.execute(select(User).where(User.email == user.email))
+        return result.scalar_one_or_none()
