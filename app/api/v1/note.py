@@ -1,38 +1,31 @@
 from fastapi import APIRouter, Depends
+from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
 from app.database import get_session
-from app.models import Note as NoteModel, Tag as TagModel
+from app.exceptions.exceptions import UserNotFoundException
 from app.schemas import note as note_schema
+from app.services import NoteService
 
 router = APIRouter(prefix="/notes", tags=["notes"])
 
 
 @router.get("/", response_model=list[note_schema.NoteResponse])
 async def get_notes(session: AsyncSession=Depends(get_session)):
-    result = await session.execute(select(NoteModel).options(selectinload(NoteModel.tags)))
-    notes = result.scalars().all()
-    return notes
+    note_service = NoteService(session)
+    return await note_service.get_notes()
 
 
 @router.post("/create", response_model=note_schema.NoteResponse)
 async def create_note(note: note_schema.NoteCreate, session: AsyncSession=Depends(get_session)):
-    tags_db = []
-    for tag_name in note.tags:
-        tag = await session.execute(select(TagModel).where(TagModel.name == tag_name))
-        tag = tag.scalar_one_or_none()
-        if not tag:
-            tag = TagModel(name=tag_name)
-            session.add(tag)
-        tags_db.append(tag)
-    
-    note_data = note.model_dump(exclude={'tags'})
-    note_db = NoteModel(**note_data, tags=tags_db)
-    session.add(note_db)
-    
-    await session.commit()
-    await session.refresh(note_db)
+    note_service = NoteService(session)
+    try:
+        return await note_service.create_note(note)
+    except UserNotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
 
-    return note_db
+
+@router.get("/by_tags", response_model=list[note_schema.NoteResponse])
+async def get_notes_by_tags(tags: list[str], session: AsyncSession=Depends(get_session)):
+    note_service = NoteService(session)
+    return await note_service.get_notes_by_tags(tags)
