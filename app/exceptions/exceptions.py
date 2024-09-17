@@ -13,3 +13,11 @@ class UserNotFoundException(Exception):
 
     def __str__(self):
         return self.message
+    
+
+class NoteNotFoundException(Exception):
+    def __init__(self) -> None:
+        self.message = f"Note not found"
+
+    def __str__(self):
+        return self.message
