@@ -15,6 +15,10 @@ class NoteCreate(NoteBase):
     tags: list[str] = None
 
 
+class NoteUpdate(NoteBase):
+    tags: list[str] = None
+
+
 class NoteResponse(NoteBase):
     id: int
     user_id: int
