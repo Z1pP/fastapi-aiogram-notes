@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Depends
-from fastapi.exceptions import HTTPException, ResponseValidationError
-from pydantic import ValidationError
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
-from app.exceptions.exceptions import UserAlreadyExistsException
+from app.exceptions.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.schemas import UserResponse, UserCreate
 from app.services import UserService
 
@@ -27,4 +25,10 @@ async def create_user(user: UserCreate, session: AsyncSession = Depends(get_sess
         raise HTTPException(status_code=400, detail=str(e))
 
 
-#@router.get("/{user_id}", response_model=UserResponse)
+@router.get("/{user_id}", response_model=UserResponse)
+async def get_user_by_id(user_id: int, session: AsyncSession = Depends(get_session)):
+    user_service = UserService(session)
+    try:
+        return await user_service.get_user_by_id(user_id)
+    except UserNotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
