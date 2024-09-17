@@ -16,7 +16,7 @@ async def get_notes(session: AsyncSession=Depends(get_session)):
     return await note_service.get_notes()
 
 
-@router.post("/create", response_model=note_schema.NoteResponse)
+@router.post("/create", response_model=note_schema.NoteResponse, status_code=201)
 async def create_note(note: note_schema.NoteCreate, session: AsyncSession=Depends(get_session)):
     note_service = NoteService(session)
     try:
@@ -25,7 +25,7 @@ async def create_note(note: note_schema.NoteCreate, session: AsyncSession=Depend
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.delete("/{note_id}")
+@router.delete("/{note_id}", status_code=204)
 async def delete_note(note_id: int, session: AsyncSession=Depends(get_session)):
     note_service = NoteService(session)
     try:
