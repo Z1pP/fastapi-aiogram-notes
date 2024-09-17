@@ -3,7 +3,7 @@ from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_session
-from app.exceptions.exceptions import UserNotFoundException
+from app.exceptions.exceptions import NoteNotFoundException, UserNotFoundException
 from app.schemas import note as note_schema
 from app.services import NoteService
 
@@ -22,6 +22,15 @@ async def create_note(note: note_schema.NoteCreate, session: AsyncSession=Depend
     try:
         return await note_service.create_note(note)
     except UserNotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.delete("/{note_id}")
+async def delete_note(note_id: int, session: AsyncSession=Depends(get_session)):
+    note_service = NoteService(session)
+    try:
+        return await note_service.delete_note(note_id)
+    except NoteNotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
 
 
