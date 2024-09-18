@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models.user import User
-from app.schemas.user import UserResponse, UserCreate
+from app.schemas.user import UserResponse, UserCreate, UserUpdate
 
 
 class UserService:
@@ -49,3 +49,29 @@ class UserService:
     async def get_user_by_email(self, user: UserCreate) -> UserResponse:
         result = await self.session.execute(select(User).where(User.email == user.email))
         return result.scalar_one_or_none()
+    
+    async def update_user(self, user_id: int, user: UserUpdate) -> UserResponse:
+        db_user = await self.get_user_by_id(user_id)
+        if db_user is None:
+            raise UserNotFoundException()
+        
+        if user.password:
+            hashed_password = user.password
+        else:
+            hashed_password = db_user.hashed_password
+
+        db_user = User(**user.model_dump(exclude="password"), hashed_password=hashed_password)
+        self.session.add(db_user)
+
+        await self.session.commit()
+        await self.session.refresh(db_user)
+        
+        return UserResponse(
+            id=db_user.id,
+            username=db_user.username,
+            is_active=db_user.is_active,
+            email=db_user.email,
+            created_at=db_user.created_at,
+            updated_at=db_user.updated_at,
+            notes=db_user.notes
+        )
