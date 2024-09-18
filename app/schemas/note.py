@@ -24,7 +24,7 @@ class NoteResponse(NoteBase):
     user_id: int
     create_at: datetime
     update_at: datetime
-    tags: list[TagResponse]
+    tags: list[TagResponse] = Field(default_factory=list)
 
     class Config:
         from_attributes = True
