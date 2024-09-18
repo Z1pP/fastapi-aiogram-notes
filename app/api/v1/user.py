@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
 from app.exceptions.exceptions import UserAlreadyExistsException, UserNotFoundException
-from app.schemas import UserCreate, UserResponse
+from app.schemas import UserCreate, UserResponse, UserUpdate
 from app.services import UserService
 
 
@@ -30,5 +30,14 @@ async def get_user_by_id(user_id: int, session: AsyncSession = Depends(get_async
     user_service = UserService(session)
     try:
         return await user_service.get_user_by_id(user_id)
+    except UserNotFoundException as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    
+
+@router.put("/{user_id}", response_model=UserResponse)
+async def update_user(user_id: int, user: UserUpdate, session: AsyncSession = Depends(get_async_session)):
+    user_service = UserService(session)
+    try:
+        return await user_service.update_user(user_id, user)
     except UserNotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
