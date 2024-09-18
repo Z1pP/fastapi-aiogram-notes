@@ -16,6 +16,10 @@ class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
 
 
+class UserUpdate(UserBase):
+    password: Optional[str] = Field(None, min_length=8)
+
+
 class UserResponse(UserBase):
     id: int
     created_at: datetime
