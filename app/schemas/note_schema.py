@@ -22,8 +22,8 @@ class NoteUpdate(NoteBase):
 class NoteResponse(NoteBase):
     id: int
     user_id: int
-    create_at: datetime
-    update_at: datetime
+    created_at: datetime
+    updated_at: datetime
     tags: list[TagResponse] = Field(default_factory=list)
 
     class Config:
