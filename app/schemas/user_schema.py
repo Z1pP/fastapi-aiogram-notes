@@ -1,15 +1,13 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 
 from .note_schema import NoteResponse
+from .tg_profile_schema import TgProfileResponse
 
 
 class UserBase(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50)
-    email: str = Field(..., max_length=100)
-    telegram_id: Optional[int] = None
-    is_active: bool = Field(default=True)
+    email: EmailStr
 
 
 class UserCreate(UserBase):
@@ -25,6 +23,7 @@ class UserResponse(UserBase):
     created_at: datetime
     updated_at: datetime
     notes: list[NoteResponse] = Field(default_factory=list)
+    tg_profile: Optional[TgProfileResponse] = None
 
     class Config:
         from_attributes = True
