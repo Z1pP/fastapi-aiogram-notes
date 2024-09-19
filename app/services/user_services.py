@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models.user import User
 from app.schemas.user_schema import UserResponse, UserCreate, UserUpdate
-from app.utils.password import get_hashed_password
+from app.utils.password import hash_password
 
 
 class UserService:
@@ -17,7 +17,7 @@ class UserService:
         if db_user:
             raise UserAlreadyExistsException(user.email)
         
-        hashed_password = get_hashed_password(user.password)
+        hashed_password = hash_password(user.password)
 
         db_user = User(**user.model_dump(exclude="password"), hashed_password=hashed_password)
         self.session.add(db_user)
@@ -60,20 +60,19 @@ class UserService:
         if db_user is None:
             raise UserNotFoundException()
         
-        if user.password:
-            hashed_password = get_hashed_password(user.password)
-
-        if user.email:
-            existing_user = await self.get_user_by_email(user.email)
-            if existing_user:
-                raise UserAlreadyExistsException(user.email)
-
-        db_user = User(
-            **user.model_dump(exclude="password"), 
-            hashed_password=hashed_password
-        )
-        self.session.add(db_user)
-
+        update_data = user.model_dump(exclude_unset=True)
+        
+        if 'email' in update_data:
+            existing_user = await self.get_user_by_email(update_data['email'])
+            if existing_user and existing_user.id != user_id:
+                raise UserAlreadyExistsException(update_data['email'])
+        
+        if 'password' in update_data:
+            update_data['hashed_password'] = hash_password(update_data.pop('password'))
+        
+        for key, value in update_data.items():
+            setattr(db_user, key, value)
+        
         await self.session.commit()
         await self.session.refresh(db_user)
         
