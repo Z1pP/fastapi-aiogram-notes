@@ -17,7 +17,7 @@ class TgProfileUpdate(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
 
-class TgProfile(TgProfileBase):
+class TgProfileResponse(TgProfileBase):
     id: int
     user_id: int
     created_at: datetime
