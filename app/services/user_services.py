@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models.user import User
-from app.schemas.user import UserResponse, UserCreate, UserUpdate
+from app.schemas.user_schema import UserResponse, UserCreate, UserUpdate
 
 
 class UserService:
