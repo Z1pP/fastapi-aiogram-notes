@@ -1,5 +1,5 @@
-from .user import UserResponse, UserCreate, UserUpdate
-from .note import NoteCreate, NoteResponse, NoteUpdate
+from .user_schema import UserResponse, UserCreate, UserUpdate
+from .note_schema import NoteCreate, NoteResponse, NoteUpdate
 __all__ = [
     "UserResponse",
     "UserCreate",
