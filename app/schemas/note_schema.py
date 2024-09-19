@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-from .tag import TagResponse
+from .tag_schema import TagResponse
 
 
 class NoteBase(BaseModel):

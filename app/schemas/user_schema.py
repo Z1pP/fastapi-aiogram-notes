@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
 
-from .note import NoteResponse
+from .note_schema import NoteResponse
 
 
 class UserBase(BaseModel):
