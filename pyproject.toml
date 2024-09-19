@@ -17,6 +17,7 @@ pyjwt = {extras = ["crypto"], version = "^2.9.0"}
 alembic = "^1.13.2"
 pydantic-settings = "^2.5.2"
 psycopg2-binary = "^2.9.9"
+pydantic = {extras = ["email"], version = "^2.9.2"}
 
 
 [build-system]
