@@ -41,6 +41,8 @@ async def update_user(user_id: int, user: UserUpdate, session: AsyncSession = De
         return await user_service.update_user(user_id, user)
     except UserNotFoundException as e:
         raise HTTPException(status_code=404, detail=str(e))
+    except UserAlreadyExistsException as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
 
 @router.delete("/{user_id}", status_code=204)

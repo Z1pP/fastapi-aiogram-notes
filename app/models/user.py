@@ -26,5 +26,5 @@ class User(Base):
         onupdate=func.now()
     )
 
-    notes: Mapped[list["Note"]] = relationship(back_populates="user")
-    tg_profile: Mapped["TgProfile"] = relationship(uselist=False, back_populates="user")
+    notes: Mapped[list["Note"]] = relationship(back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    tg_profile: Mapped["TgProfile"] = relationship(uselist=False, back_populates="user", cascade="all, delete-orphan", lazy="selectin")

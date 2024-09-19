@@ -1,2 +1,2 @@
-def hash_password(password: str) -> str:
+def get_hashed_password(password: str) -> str:
     return password
