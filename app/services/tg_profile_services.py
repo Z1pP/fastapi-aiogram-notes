@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.exceptions.exceptions import *
 from app.services import UserService
 from app.schemas import TgProfileCreate, TgProfileResponse, TgProfileUpdate
-from app.models import User, TgProfile
+from app.models import TgProfile
 
 class TgProfileService:
     def __init__(self, session: AsyncSession) -> None:
