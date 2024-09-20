@@ -9,6 +9,14 @@ from app.utils.logger import user_logger, error_logger
 app = FastAPI(docs_url="/api", openapi_prefix="/api/v1")
 app.include_router(api_router)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Логирование всех входящих запросов."""
