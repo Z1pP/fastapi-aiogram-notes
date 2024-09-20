@@ -33,3 +33,12 @@ class TgProfileAlreadyExistsException(Exception):
 
     def __str__(self):
         return self.message
+    
+
+class TgProfileNotFoundException(Exception):
+    def __init__(self):
+        self.message = f"Tg profile not found"
+        self.status_code = 404
+
+    def __str__(self):
+        return self.message
