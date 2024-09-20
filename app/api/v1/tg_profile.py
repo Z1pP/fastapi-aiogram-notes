@@ -8,7 +8,11 @@ from app.schemas import (
     TgProfileUpdate,
 )
 from app.services import TgProfileService
-from app.exceptions import UserNotFoundException, TgProfileAlreadyExistsException
+from app.exceptions import (
+    UserNotFoundException, 
+    TgProfileAlreadyExistsException, 
+    UserAlreadyExistsException
+)
 
 router = APIRouter(prefix="/tg_profile", tags=["tg_profile"])
 
@@ -21,6 +25,8 @@ async def create_tg_profile(
     tg_profile_service = TgProfileService(session)
     try:
         return await tg_profile_service.create_tg_profile(new_profile)
+    except UserAlreadyExistsException as e:
+        raise HTTPException(status_code=e.status_code, detail=str(e))
     except UserNotFoundException as e:
         raise HTTPException(status_code=e.status_code, detail=str(e))
     except TgProfileAlreadyExistsException as e:
