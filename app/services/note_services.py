@@ -48,7 +48,7 @@ class NoteService:
         if not db_note:
             raise NoteNotFoundException()
         
-        note_data = note.model_dump(exclude={'tags'})
+        note_data = note.model_dump(exclude={'tags'}, exclude_unset=True)
         for key, value in note_data.items():
             setattr(db_note, key, value)
         
