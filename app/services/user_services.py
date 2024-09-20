@@ -11,6 +11,11 @@ from app.utils.password import hash_password
 class UserService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+
+    async def _check_user_exist(self, user_id: int) -> bool:
+        user = await self.get_user_by_id(user_id)
+        if user:
+            raise UserAlreadyExistsException(user.email)
     
     async def create_user(self, user: UserCreate) -> UserResponse:
         db_user = await self.get_user_by_email(user.email)
