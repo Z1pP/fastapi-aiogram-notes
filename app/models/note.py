@@ -21,12 +21,12 @@ class Note(Base):
     title: Mapped[str] = mapped_column(String, index=True, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
     is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
-    create_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), 
         server_default=func.now(),
         index=True
     )
-    update_at: Mapped[datetime] = mapped_column(
+    updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
         onupdate=func.now()

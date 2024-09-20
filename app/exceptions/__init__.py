@@ -1,7 +1,14 @@
-from .exceptions import UserAlreadyExistsException, UserNotFoundException
+from .exceptions import (
+    UserAlreadyExistsException,
+    UserNotFoundException, 
+    TgProfileAlreadyExistsException,
+    TgProfileNotFoundException
+)
 
 
 __all__ = [
     "UserAlreadyExistsException",
-    "UserNotFoundException"
+    "UserNotFoundException",
+    "TgProfileAlreadyExistsException",
+    "TgProfileNotFoundException"
 ]
