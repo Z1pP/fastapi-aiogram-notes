@@ -56,7 +56,7 @@ async def update_tg_profile(
 ):
     tg_profile_service = TgProfileService(session)
     try:
-        return await tg_profile_service.update_tg_profile(tg_id, update_data)
+        return await tg_profile_service.update_tg_profile(update_data)
     except TgProfileNotFoundException as e:
         raise HTTPException(status_code=e.status_code, detail=str(e))
     
