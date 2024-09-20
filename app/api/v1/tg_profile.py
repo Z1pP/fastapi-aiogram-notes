@@ -49,9 +49,8 @@ async def get_tg_profile_by_tg_id(
         raise HTTPException(status_code=e.status_code, detail=str(e))
     
 
-@router.put("/update/{tg_id}", response_model=TgProfileResponse)
+@router.put("/update", response_model=TgProfileResponse)
 async def update_tg_profile(
-    tg_id: int,
     update_data: TgProfileUpdate,
     session: AsyncSession = Depends(get_async_session)
 ):
