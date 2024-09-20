@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_async_session
-from app.exceptions.exceptions import UserAlreadyExistsException, UserNotFoundException
+from app.exceptions import *
 from app.schemas import UserCreate, UserResponse, UserUpdate
 from app.services import UserService
 
