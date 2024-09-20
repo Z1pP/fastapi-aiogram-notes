@@ -11,13 +11,7 @@ from .user_services import UserService
 class NoteService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
-
-    async def _check_user_exist(self, user_id: int) -> bool:
-        user_service = UserService(self.session)
-        user = await user_service.get_user_by_id(user_id)
-        if user:
-            return True
-        return False
+        self.user_service = UserService(self.session)
     
     async def _add_tags_to_note(self, note: list, tags: list[str]) -> None:
         for tag_name in tags:
@@ -30,8 +24,8 @@ class NoteService:
         return note
 
     async def create_note(self, note: NoteCreate) -> NoteResponse:
-        if not await self._check_user_exist(note.user_id):
-            raise UserNotFoundException()
+        # Проверка на существование пользователя
+        await self.user_service._check_user_exist(note.user_id)
         
         tags_db = []
         if note.tags:
