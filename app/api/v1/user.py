@@ -16,7 +16,7 @@ async def get_users(session: AsyncSession = Depends(get_async_session)):
     return await user_service.get_users()
 
 
-@router.post('/create', response_model=UserResponse)
+@router.post('/create', response_model=UserResponse, status_code=201)
 async def create_user(user: UserCreate, session: AsyncSession = Depends(get_async_session)):
     user_seкvice = UserService(session)
     try:
