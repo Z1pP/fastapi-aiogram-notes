@@ -9,7 +9,7 @@ from .base import Base
 if TYPE_CHECKING:
     from .note import Note
     from .tg_profile import TgProfile
-
+    from .token import Token
 class User(Base):
     __tablename__ = "users"
 
@@ -28,3 +28,4 @@ class User(Base):
 
     notes: Mapped[list["Note"]] = relationship(back_populates="user", cascade="all, delete-orphan", lazy="selectin")
     tg_profile: Mapped["TgProfile"] = relationship(uselist=False, back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+    token: Mapped["Token"] = relationship(back_populates="user", cascade="all, delete-orphan", lazy="selectin")
