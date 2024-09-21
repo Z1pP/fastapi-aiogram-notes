@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.v1 import router as api_router
 from app.utils.logger import user_logger, error_logger
 
-app = FastAPI(docs_url="/api", openapi_prefix="/api/v1")
+app = FastAPI(docs_url="/api", openapi_prefix="/api")
 app.include_router(api_router)
 
 app.add_middleware(
