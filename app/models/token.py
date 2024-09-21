@@ -13,7 +13,7 @@ class Token(Base):
     __tablename__ = "tokens"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("user.id"), nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     token: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     token_type: Mapped[str] = mapped_column(String, nullable=False)
     revoked: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
