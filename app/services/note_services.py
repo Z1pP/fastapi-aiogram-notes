@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.exceptions.exceptions import NoteNotFoundException, UserNotFoundException
-from app.schemas import NoteCreate, NoteResponse, NoteUpdate
+from app.schemas import NoteCreate, NoteResponse, NoteUpdate, TagCreate
 from app.models import Tag, Note
 from .user_services import UserService
 
@@ -13,26 +13,28 @@ class NoteService:
         self.session = session
         self.user_service = UserService(self.session)
     
-    async def _add_tags_to_note(self, note: list, tags: list[str]) -> None:
-        for tag_name in tags:
-            tag = await self.session.execute(select(Tag).where(Tag.name == tag_name))
-            tag = tag.scalar_one_or_none()
-            if not tag:
-                tag = Tag(name=tag_name)
-                self.session.add(tag)
-            note.append(tag)
-        return note
+    async def _add_tags_to_note(self, tags: list[TagCreate]) -> list[Tag]:
+        tags_list = list()
+        for tag in tags:
+            tag_db = await self.session.execute(select(Tag).where(Tag.name == tag.name))
+            tag_db = tag_db.scalar_one_or_none()
+            if not tag_db:
+                new_tag_db = Tag(name=tag.name)
+                self.session.add(new_tag_db)
+            tags_list.append(new_tag_db)
+        return tags_list
 
     async def create_note(self, note: NoteCreate) -> NoteResponse:
         # Проверка на существование пользователя
-        await self.user_service._check_user_exist(note.user_id)
-        
-        tags_db = []
+        user_db = await self.user_service.get_user_by_id(note.user_id)
+        if not user_db:
+            raise UserNotFoundException()
+
         if note.tags:
-            tags_db = await self._add_tags_to_note(tags_db, note.tags)
+            new_tags_db = await self._add_tags_to_note(note.tags)
         
         note_data = note.model_dump(exclude={'tags'})
-        note_db = Note(**note_data, tags=tags_db)
+        note_db = Note(**note_data, tags=new_tags_db)
         self.session.add(note_db)
         
         await self.session.commit()
@@ -52,10 +54,9 @@ class NoteService:
         for key, value in note_data.items():
             setattr(db_note, key, value)
         
-        tags_db = []
         if note.tags:
-            tags_db = await self._add_tags_to_note(tags_db, note.tags)
-            db_note.tags = tags_db
+            updated_tags_db = await self._add_tags_to_note(note.tags)
+            db_note.tags = updated_tags_db
         
         await self.session.commit()
         await self.session.refresh(db_note)

@@ -51,7 +51,7 @@ class UserService:
         if user is None:
             raise UserNotFoundException()
         return user
-    
+        
     async def get_user_by_email(self, email: str) -> UserResponse:
         query = select(User).where(User.email == email).options(
             selectinload(User.notes),
