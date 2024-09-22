@@ -5,5 +5,5 @@ from .tg_profile_services import TgProfileService
 __all__ = [
     "UserService",
     "NoteService",
-    TgProfileService.__class__.__name__,
+    "TgProfileService",
 ]
