@@ -73,6 +73,7 @@ async def process_email(message: Message, state: FSMContext):
             await message.answer("Пожалуйста, введите ваш пароль:")
     await state.set_state(RegistrationStates.password)
 
+
 @dp.message(RegistrationStates.password)
 async def process_password(message: Message, state: FSMContext):
     await state.update_data(password=message.text)
@@ -89,10 +90,10 @@ async def process_password(message: Message, state: FSMContext):
     await message.answer("Регистрация завершена. Теперь вы можете использовать бот для управления своими заметками.")
     await state.clear()
 
+
 @dp.message(lambda message: message.text)
 async def echo_message(message: Message):
     await message.answer(message.text)
-
 
 
 if __name__ == "__main__":
