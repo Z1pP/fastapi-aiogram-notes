@@ -15,16 +15,15 @@ if TYPE_CHECKING:
 class Tag(Base):
     __tablename__ = "tags"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, name='id')
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, name="id")
     name: Mapped[str] = mapped_column(String, nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), 
-        server_default=func.now()
+        DateTime(timezone=True), server_default=func.now()
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        onupdate=func.now()
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
 
-    notes: Mapped[list["Note"]] = relationship(secondary=NoteTag.__table__, back_populates="tags")
+    notes: Mapped[list["Note"]] = relationship(
+        secondary=NoteTag.__table__, back_populates="tags"
+    )

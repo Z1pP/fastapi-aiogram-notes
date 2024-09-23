@@ -1,8 +1,8 @@
 from .exceptions import (
     UserAlreadyExistsException,
-    UserNotFoundException, 
+    UserNotFoundException,
     TgProfileAlreadyExistsException,
-    TgProfileNotFoundException
+    TgProfileNotFoundException,
 )
 
 
@@ -10,5 +10,5 @@ __all__ = [
     "UserAlreadyExistsException",
     "UserNotFoundException",
     "TgProfileAlreadyExistsException",
-    "TgProfileNotFoundException"
+    "TgProfileNotFoundException",
 ]

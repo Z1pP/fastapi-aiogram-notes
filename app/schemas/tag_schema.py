@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class TagBase(BaseModel):
@@ -11,5 +11,5 @@ class TagCreate(TagBase):
 
 
 class TagResponse(TagBase):
-    created_at: datetime
-    updated_at: datetime
+    created_at: datetime = Field(default=None)
+    updated_at: datetime = Field(default=None)
