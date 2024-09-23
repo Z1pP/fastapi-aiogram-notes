@@ -19,6 +19,7 @@ pydantic-settings = "^2.5.2"
 psycopg2-binary = "^2.9.9"
 pydantic = {extras = ["email"], version = "^2.9.2"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+mypy = "^1.11.2"
 
 
 [build-system]
