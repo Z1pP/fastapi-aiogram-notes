@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_async_session
+from app.db.database import get_async_session
 from app.schemas import (
     TgProfileCreate,
     TgProfileResponse,

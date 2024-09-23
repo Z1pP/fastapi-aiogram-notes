@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 
-from app.api.v1.user import router as user_router
-from app.api.v1.note import router as note_router
-from app.api.v1.tg_profile import router as tg_profile_router
+from .user import router as user_router
+from .note import router as note_router
+from .tg_profile import router as tg_profile_router
 
 
 router = APIRouter(prefix="/v1")

@@ -7,8 +7,8 @@ from sqlalchemy import select
 
 from app.core.config import settings
 from app.models import TgProfile
-from app.database import get_async_session
-from app.models.user import User
+from app.db.database import get_async_session
+from app.models import User
 from app.utils.password import hash_password, verify_password
 
 bot = Bot(token=settings.BOT_TOKEN)

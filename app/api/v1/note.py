@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from fastapi.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.database import get_async_session
+from app.db.database import get_async_session
 from app.exceptions.exceptions import NoteNotFoundException, UserNotFoundException
 from app.schemas import NoteCreate, NoteResponse, NoteUpdate
 from app.services import NoteService
