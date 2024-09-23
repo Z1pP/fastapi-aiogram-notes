@@ -6,6 +6,7 @@ from app.services import UserService
 from app.schemas import TgProfileCreate, TgProfileResponse, TgProfileUpdate
 from app.models import TgProfile
 
+
 class TgProfileService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -17,14 +18,16 @@ class TgProfileService:
         tg_profile_db = result.scalar_one_or_none()
         if tg_profile_db:
             raise TgProfileAlreadyExistsException()
-        
+
     async def get_all_tg_profiles(self) -> list[TgProfileResponse]:
         query = select(TgProfile)
         result = await self.session.execute(query)
         tg_profiles_db = result.scalars().all()
         return list(tg_profiles_db)
 
-    async def create_tg_profile(self, new_profile: TgProfileCreate) -> TgProfileResponse:
+    async def create_tg_profile(
+        self, new_profile: TgProfileCreate
+    ) -> TgProfileResponse:
         # Проверка на существование пользователя
         user = await self.user_servise.get_user_by_id(new_profile.user_id)
         if not user:
@@ -37,7 +40,7 @@ class TgProfileService:
         await self.session.commit()
         await self.session.refresh(tg_profile_db)
         return tg_profile_db
-    
+
     async def get_tg_profile_by_tg_id(self, tg_id: int) -> TgProfileResponse:
         query = select(TgProfile).where(TgProfile.tg_id == tg_id)
         result = await self.session.execute(query)
@@ -45,8 +48,10 @@ class TgProfileService:
         if not tg_profile_db:
             raise TgProfileNotFoundException()
         return tg_profile_db
-    
-    async def update_tg_profile(self, tg_id: int, update_data: TgProfileUpdate) -> TgProfileResponse:
+
+    async def update_tg_profile(
+        self, tg_id: int, update_data: TgProfileUpdate
+    ) -> TgProfileResponse:
         tg_profile_db = await self.get_tg_profile_by_tg_id(update_data.tg_id)
         for field, value in update_data.model_dump(exclude_unset=True).items():
             setattr(tg_profile_db, field, value)
@@ -54,7 +59,7 @@ class TgProfileService:
         await self.session.commit()
         await self.session.refresh(tg_profile_db)
         return tg_profile_db
-    
+
     async def delete_tg_profile(self, tg_id: int) -> None:
         tg_profile_db = await self.get_tg_profile_by_tg_id(tg_id)
         await self.session.delete(tg_profile_db)

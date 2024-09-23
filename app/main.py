@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
     """Логирование всех входящих запросов."""
@@ -24,14 +25,16 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
     return response
 
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Глобальный обработчик исключений."""
     error_logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"message": "Внутренняя ошибка сервера. Пожалуйста, попробуйте позже."}
+        content={"message": "Внутренняя ошибка сервера. Пожалуйста, попробуйте позже."},
     )
+
 
 if __name__ == "__main__":
     try:

@@ -12,7 +12,7 @@ class NoteService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.user_service = UserService(self.session)
-    
+
     async def _add_tags_to_note(self, tags: list[TagCreate]) -> list[Tag]:
         tags_list = list()
         for tag in tags:
@@ -32,16 +32,16 @@ class NoteService:
 
         if note.tags:
             new_tags_db = await self._add_tags_to_note(note.tags)
-        
-        note_data = note.model_dump(exclude={'tags'})
+
+        note_data = note.model_dump(exclude={"tags"})
         note_db = Note(**note_data, tags=new_tags_db)
         self.session.add(note_db)
-        
+
         await self.session.commit()
         await self.session.refresh(note_db)
 
         return note_db
-    
+
     async def update_note(self, note_id: int, note: NoteUpdate) -> NoteResponse:
         query = select(Note).where(Note.id == note_id)
         result = await self.session.execute(query)
@@ -49,32 +49,38 @@ class NoteService:
 
         if not db_note:
             raise NoteNotFoundException()
-        
-        note_data = note.model_dump(exclude={'tags'}, exclude_unset=True)
+
+        note_data = note.model_dump(exclude={"tags"}, exclude_unset=True)
         for key, value in note_data.items():
             setattr(db_note, key, value)
-        
+
         if note.tags:
             updated_tags_db = await self._add_tags_to_note(note.tags)
             db_note.tags = updated_tags_db
-        
+
         await self.session.commit()
         await self.session.refresh(db_note)
 
         return db_note
-                
-    
+
     async def get_notes(self) -> list[NoteResponse]:
-        result = await self.session.execute(select(Note).options(selectinload(Note.tags)))
+        result = await self.session.execute(
+            select(Note).options(selectinload(Note.tags))
+        )
         notes = result.scalars().all()
         return notes
-    
+
     async def get_notes_by_tags(self, tags: list[str]) -> list[NoteResponse]:
-        query = select(Note).join(Note.tags).where(Tag.name.in_(tags)).options(selectinload(Note.tags))
+        query = (
+            select(Note)
+            .join(Note.tags)
+            .where(Tag.name.in_(tags))
+            .options(selectinload(Note.tags))
+        )
         result = await self.session.execute(query)
         notes = result.scalars().unique().all()
         return notes
-    
+
     async def delete_note(self, note_id: int) -> None:
         query = select(Note).where(Note.id == note_id)
         result = await self.session.execute(query)

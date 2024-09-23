@@ -15,7 +15,7 @@ class UserNotFoundException(Exception):
 
     def __str__(self):
         return self.message
-    
+
 
 class NoteNotFoundException(Exception):
     def __init__(self) -> None:
@@ -24,7 +24,7 @@ class NoteNotFoundException(Exception):
 
     def __str__(self):
         return self.message
-    
+
 
 class TgProfileAlreadyExistsException(Exception):
     def __init__(self):
@@ -33,7 +33,7 @@ class TgProfileAlreadyExistsException(Exception):
 
     def __str__(self):
         return self.message
-    
+
 
 class TgProfileNotFoundException(Exception):
     def __init__(self):
