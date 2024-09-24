@@ -16,13 +16,14 @@ async def get_users(session: AsyncSession = Depends(get_async_session)):
     return await user_service.get_users()
 
 
-@router.post("/create", response_model=UserResponse, status_code=201)
+@router.post("/create", status_code=201)
 async def create_user(
     user: UserCreate, session: AsyncSession = Depends(get_async_session)
 ):
     user_seкvice = UserService(session)
     try:
-        return await user_seкvice.create_user(user)
+        await user_seкvice.create_user(user)
+        return Response(status_code=201)
     except UserAlreadyExistsException as e:
         raise HTTPException(status_code=400, detail=str(e))
 
