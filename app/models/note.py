@@ -20,7 +20,6 @@ class Note(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), name="user_id")
     title: Mapped[str] = mapped_column(String, index=True, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=False)
-    is_completed: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), index=True
     )
