@@ -9,7 +9,6 @@ from .base import Base
 if TYPE_CHECKING:
     from .note import Note
     from .tg_profile import TgProfile
-    from .token import Token
 
 
 class User(Base):
@@ -35,7 +34,4 @@ class User(Base):
         back_populates="user",
         cascade="all, delete-orphan",
         lazy="selectin",
-    )
-    token: Mapped["Token"] = relationship(
-        back_populates="user", cascade="all, delete-orphan", lazy="selectin"
     )
