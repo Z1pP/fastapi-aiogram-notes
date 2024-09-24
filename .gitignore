@@ -25,3 +25,12 @@ Thumbs.db
 
 #Poetry
 poetry.lock
+
+#certs
+certs/
+
+#mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+dmypy.lock
