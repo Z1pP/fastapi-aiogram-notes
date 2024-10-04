@@ -59,6 +59,7 @@ async def update_note(
 @router.get("/by_tags", response_model=list[NoteResponse])
 async def get_notes_by_tags(
     tags: list[str],
+    user: UserResponse = Depends(get_current_auth_user),
     note_service: NoteService = Depends(get_note_service),
 ):
-    return await note_service.get_notes_by_tags(tags)
+    return await note_service.get_notes_for_user_by_tags(user.id, tags)
