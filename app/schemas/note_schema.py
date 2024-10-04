@@ -10,7 +10,6 @@ class NoteBase(BaseModel):
 
 
 class NoteCreate(NoteBase):
-    user_id: int
     tags: list[TagCreate]
 
 
