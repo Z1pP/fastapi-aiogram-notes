@@ -79,11 +79,13 @@ class NoteService:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def get_notes_by_tags(self, tags: list[str]) -> list[NoteResponse]:
+    async def get_notes_for_user_by_tags(
+        self, user_id: int, tags: list[str]
+    ) -> list[NoteResponse]:
         query = (
             select(Note)
             .join(Note.tags)
-            .where(Tag.name.in_(tags))
+            .where(Tag.name.in_(tags), Note.user_id == user_id)
             .options(selectinload(Note.tags))
         )
         result = await self.session.execute(query)
