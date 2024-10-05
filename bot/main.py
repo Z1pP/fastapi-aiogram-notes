@@ -1,3 +1,4 @@
+import logging
 from aiogram import Bot, Dispatcher
 from aiogram.types import Message
 from aiogram.filters import CommandStart, Command
@@ -10,6 +11,11 @@ from app.models import TgProfile
 from app.db.database import get_async_session
 from app.models import User
 from app.utils.password import hash_password, verify_password
+from app.utils.logger import setup_logger
+
+import bot.logging_config
+
+logger = logging.getLogger(__name__)
 
 bot = Bot(token=settings.BOT_TOKEN)
 dp = Dispatcher()
