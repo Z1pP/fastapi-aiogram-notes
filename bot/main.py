@@ -11,7 +11,6 @@ from app.models import TgProfile
 from app.db.database import get_async_session
 from app.models import User
 from app.utils.password import hash_password, verify_password
-from app.utils.logger import setup_logger
 
 import bot.logging_config
 
@@ -34,6 +33,8 @@ class LinkProfileStates(StatesGroup):
 @dp.message(CommandStart())
 async def start_command(message: Message):
     tg_id: int = message.from_user.id
+    logger.info(f"Пользователь {tg_id} выбрал команду /start")
+
     async for session in get_async_session():
         query = select(TgProfile).where(TgProfile.tg_id == tg_id)
         result = await session.execute(query)
@@ -44,7 +45,8 @@ async def start_command(message: Message):
             )
         else:
             await message.answer(
-                "Вас нет в базе данных. Пожалуйста, зарегистрируйтесь, отправив команду /register"
+                "Вас нет в базе данных. Пожалуйста, зарегистрируйтесь, отправив команду /register.\n"
+                "Вы также может подключить свой телеграм профиль, отправив команду /link_profile"
             )
 
 
@@ -133,6 +135,7 @@ async def process_password(message: Message, state: FSMContext):
                 user_db.tg_profile = new_tg_profile
                 await session.commit()
                 await message.answer(
+                    f"Здравствуйте {user_db.tg_profile.username}\n"
                     "Профиль успешно связан с Telegram. Вы можете использовать бот для управления своими заметками."
                 )
                 await state.clear()
@@ -207,9 +210,14 @@ async def echo_message(message: Message):
     await message.answer(message.text)
 
 
+@dp.error()
+async def errors_handler(update, exception):
+    logger.exception(f"Update: {update} \n{exception}")
+
+
 if __name__ == "__main__":
     try:
-        print("Bot started")
+        logger.info("Bot started")
         dp.run_polling(bot)
     except KeyboardInterrupt:
-        print("Bot stopped")
+        logger.info("Bot stopped")
