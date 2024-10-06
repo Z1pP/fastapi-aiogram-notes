@@ -3,12 +3,31 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
+
 from app.api.v1 import router as api_router
 from app.utils.logger import user_logger, error_logger
+from app.core.config import settings
 
-app = FastAPI(docs_url="/docs", openapi_prefix="/api")
+
+limiter = Limiter(
+    key_func=get_remote_address,
+    default_limits=[
+        f"{settings.rate_limit.total_request}/{settings.rate_limit.period}"
+    ],
+    storage_uri=f"{settings.rate_limit.redis_url}",
+)
+app = FastAPI(docs_url="/docs", root_path="/api")
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+
 app.include_router(api_router)
 
+app.add_middleware(SlowAPIMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -38,6 +57,6 @@ async def global_exception_handler(request: Request, exc: Exception):
 
 if __name__ == "__main__":
     try:
-        uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+        uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
     except KeyboardInterrupt:
         exit()
