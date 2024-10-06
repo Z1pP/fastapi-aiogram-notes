@@ -6,12 +6,6 @@ from pydantic_settings import BaseSettings
 BASE_DIR = Path(__file__).parent.parent.parent
 
 
-class RateLimited(BaseModel):
-    total_request: int = 10
-    period: Literal["hour", "minute"] = "hour"
-    redis_url: str = "redis://localhost:6379"
-
-
 class AuthJWT(BaseModel):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
@@ -22,18 +16,23 @@ class AuthJWT(BaseModel):
 
 
 class Settings(BaseSettings):
+    # DB
     DB_USER: str
     DB_PASSWORD: str
     DB_HOST: str
     DB_PORT: int
     DB_NAME: str
+    # Auth
     SECRET_KEY: str
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
     REFRESH_TOKEN_EXPIRE_MINUTES: int
+    # Bot
     BOT_TOKEN: str
+    # Redis
+    REDIS_HOST: str
+    REDIS_PORT: int
     authjwt: AuthJWT = AuthJWT()
-    rate_limit: RateLimited = RateLimited()
 
     class Config:
         env_file = ".env"
