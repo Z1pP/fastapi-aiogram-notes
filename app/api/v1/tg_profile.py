@@ -19,7 +19,7 @@ async def get_all_tg_profiles(
     return await tg_profile_service.get_all_tg_profiles()
 
 
-@router.post("/create", response_model=TgProfileResponse, status_code=201)
+@router.post("/", response_model=TgProfileResponse, status_code=201)
 async def create_tg_profile(
     new_profile: TgProfileCreate,
     tg_profile_service: TgProfileService = Depends(get_tg_profile_service),
@@ -34,7 +34,7 @@ async def create_tg_profile(
         raise HTTPException(status_code=e.status_code, detail=str(e))
 
 
-@router.get("/get_by_tg_id/{tg_id}", response_model=TgProfileResponse)
+@router.get("/{tg_id}", response_model=TgProfileResponse)
 async def get_tg_profile_by_tg_id(
     tg_id: int,
     tg_profile_service: TgProfileService = Depends(get_tg_profile_service),
@@ -45,7 +45,7 @@ async def get_tg_profile_by_tg_id(
         raise HTTPException(status_code=e.status_code, detail=str(e))
 
 
-@router.put("/update", response_model=TgProfileResponse)
+@router.put("/", response_model=TgProfileResponse)
 async def update_tg_profile(
     update_data: TgProfileUpdate,
     tg_profile_service: TgProfileService = Depends(get_tg_profile_service),
@@ -56,7 +56,7 @@ async def update_tg_profile(
         raise HTTPException(status_code=e.status_code, detail=str(e))
 
 
-@router.delete("/delete/{tg_id}")
+@router.delete("/{tg_id}")
 async def delete_tg_profile(
     tg_id: int,
     tg_profile_service: TgProfileService = Depends(get_tg_profile_service),
