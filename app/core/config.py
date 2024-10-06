@@ -1,8 +1,15 @@
 from pathlib import Path
+from typing import Literal
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 BASE_DIR = Path(__file__).parent.parent.parent
+
+
+class RateLimited(BaseModel):
+    total_request: int = 10
+    period: Literal["hour", "minute"] = "hour"
+    redis_url: str = "redis://localhost:6379"
 
 
 class AuthJWT(BaseModel):
@@ -26,6 +33,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int
     BOT_TOKEN: str
     authjwt: AuthJWT = AuthJWT()
+    rate_limit: RateLimited = RateLimited()
 
     class Config:
         env_file = ".env"
