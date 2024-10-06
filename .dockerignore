@@ -1,0 +1,4 @@
+alembic/versions/*.py
+*.yaml
+Dockerfile
+logs/*
