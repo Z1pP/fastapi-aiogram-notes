@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, Request, status
 
 from app.schemas import UserCreate, UserResponse, TokenInfo
 from app.services import AuthService
@@ -32,5 +32,5 @@ async def refresh_token(
 
 
 @router.get("/me/", response_model=UserResponse, status_code=200)
-async def me(user: UserResponse = Depends(get_current_auth_user)):
+async def me(request: Request, user: UserResponse = Depends(get_current_auth_user)):
     return user
