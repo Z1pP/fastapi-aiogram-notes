@@ -11,5 +11,4 @@ class TagCreate(TagBase):
 
 
 class TagResponse(TagBase):
-    created_at: datetime = Field(default=None)
-    updated_at: datetime = Field(default=None)
+    pass

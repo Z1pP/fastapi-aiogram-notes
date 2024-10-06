@@ -54,7 +54,7 @@ class UserService:
             raise UserNotFoundException()
         return user
 
-    async def get_user_by_email(self, email: str) -> UserResponse:
+    async def get_user_by_email(self, email: str) -> User:
         query = (
             select(User)
             .where(User.email == email)
