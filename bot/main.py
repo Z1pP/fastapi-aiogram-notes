@@ -210,11 +210,6 @@ async def echo_message(message: Message):
     await message.answer(message.text)
 
 
-@dp.error()
-async def errors_handler(update, exception):
-    logger.exception(f"Update: {update} \n{exception}")
-
-
 if __name__ == "__main__":
     try:
         logger.info("Bot started")
