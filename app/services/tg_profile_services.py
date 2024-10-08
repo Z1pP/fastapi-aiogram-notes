@@ -1,7 +1,11 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.exceptions.exceptions import *
+from app.exceptions.exceptions import (
+    TgProfileNotFoundException,
+    UserNotFoundException,
+    TgProfileAlreadyExistsException,
+)
 from app.services import UserService
 from app.schemas import TgProfileCreate, TgProfileResponse, TgProfileUpdate
 from app.models import TgProfile
