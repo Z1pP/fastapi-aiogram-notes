@@ -11,7 +11,6 @@ fastapi = "^0.114.2"
 sqlalchemy = "^2.0.34"
 asyncpg = "^0.29.0"
 black = "^24.8.0"
-aiogram = "^3.13.0"
 uvicorn = "^0.30.6"
 pyjwt = {extras = ["crypto"], version = "^2.9.0"}
 alembic = "^1.13.2"
@@ -22,6 +21,8 @@ passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 mypy = "^1.11.2"
 slowapi = "^0.1.9"
 redis = "^5.1.1"
+aiogram = "^3.13.1"
+ruff = "^0.6.9"
 
 
 [build-system]
