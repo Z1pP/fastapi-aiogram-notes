@@ -10,7 +10,7 @@ class UserAlreadyExistsException(Exception):
 
 class UserNotFoundException(Exception):
     def __init__(self):
-        self.message = f"User not found"
+        self.message = "User not found"
         self.status_code = 404
 
     def __str__(self):
@@ -19,7 +19,7 @@ class UserNotFoundException(Exception):
 
 class NoteNotFoundException(Exception):
     def __init__(self) -> None:
-        self.message = f"Note not found"
+        self.message = "Note not found"
         self.status_code = 404
 
     def __str__(self):
@@ -28,7 +28,7 @@ class NoteNotFoundException(Exception):
 
 class TgProfileAlreadyExistsException(Exception):
     def __init__(self):
-        self.message = f"The profile is already linked to another user"
+        self.message = "The profile is already linked to another user"
         self.status_code = 400
 
     def __str__(self):
@@ -37,7 +37,7 @@ class TgProfileAlreadyExistsException(Exception):
 
 class TgProfileNotFoundException(Exception):
     def __init__(self):
-        self.message = f"Tg profile not found"
+        self.message = "Tg profile not found"
         self.status_code = 404
 
     def __str__(self):
