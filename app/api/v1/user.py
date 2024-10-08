@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 
-from app.exceptions import *
+from app.exceptions import UserNotFoundException, UserAlreadyExistsException
 from app.schemas import UserCreate, UserResponse, UserUpdate
 from app.services import UserService
 from app.dependencies import get_user_service, get_current_auth_user
