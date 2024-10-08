@@ -12,6 +12,7 @@ from app.db.database import get_async_session
 from app.models import User
 from app.utils.password import hash_password, verify_password
 
+from bot.formater import format_note
 import bot.logging_config
 
 logger = logging.getLogger(__name__)
@@ -28,6 +29,12 @@ class RegistrationStates(StatesGroup):
 class LinkProfileStates(StatesGroup):
     email = State()
     password = State()
+
+
+class AddNoteState(StatesGroup):
+    title = State()
+    description = State()
+    tags = State()
 
 
 @dp.message(CommandStart())
@@ -91,6 +98,40 @@ async def notes_command(message: Message):
         await message.answer(message_text)
 
 
+@dp.message(Command("add_note"))
+async def add_note(message: Message, state: FSMContext):
+    await message.answer("Как будет называться заметка?")
+    await state.set_state(AddNoteState.title)
+
+
+@dp.message(AddNoteState.title)
+async def note_title_process(message: Message, state: FSMContext):
+    await state.update_data(title=message.text)
+    await message.answer("Добавь описание своей заметке")
+    await state.set_state(AddNoteState.description)
+
+
+@dp.message(AddNoteState.description)
+async def note_description_process(message: Message, state: FSMContext):
+    description = message.text
+    if len(description) < 5:
+        await message.answer("Хуета")
+        return
+    await state.update_data(description=description)
+    await message.answer("Добавь теги через запятую")
+    await state.set_state(AddNoteState.tags)
+
+
+@dp.message(AddNoteState.tags)
+async def note_tags_process(message: Message, state: FSMContext):
+    tags = message.text.split(",")
+    await state.update_data(tags=tags)
+    formatted_note = format_note(**await state.get_data())
+    await message.answer(formatted_note.model_dump_json())
+
+    await state.clear()
+
+
 @dp.message(Command("link_profile"))
 async def link_profile_command(message: Message, state: FSMContext):
     tg_id: int = message.from_user.id
@@ -116,7 +157,7 @@ async def process_email(message: Message, state: FSMContext):
 
 
 @dp.message(LinkProfileStates.password)
-async def process_password(message: Message, state: FSMContext):
+async def process_link_password(message: Message, state: FSMContext):
     await state.update_data(password=message.text)
 
     data = await state.get_data()
@@ -167,7 +208,7 @@ async def delete_profile_command(message: Message):
 
 
 @dp.message(RegistrationStates.email)
-async def process_email(message: Message, state: FSMContext):
+async def process_register_email(message: Message, state: FSMContext):
     async for session in get_async_session():
         query = select(User).where(User.email == message.text)
         result = await session.execute(query)
@@ -184,7 +225,7 @@ async def process_email(message: Message, state: FSMContext):
 
 
 @dp.message(RegistrationStates.password)
-async def process_password(message: Message, state: FSMContext):
+async def process_register_password(message: Message, state: FSMContext):
     await state.update_data(password=message.text)
 
     data = await state.get_data()
