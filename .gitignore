@@ -30,8 +30,9 @@ poetry.lock
 #certs
 certs/
 
-#mypy
+#Linters
 .mypy_cache/
 .dmypy.json
 dmypy.json
 dmypy.lock
+.ruff_cache/
