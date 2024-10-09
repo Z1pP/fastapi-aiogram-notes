@@ -1,44 +1,37 @@
-class UserAlreadyExistsException(Exception):
+class AppException(Exception):
+    status_code: int = 500  # default status code
+
+    def __init__(self, message: str, status_code: int):
+        super().__init__(message)
+        if status_code is not None:
+            self.status_code = status_code
+
+
+class UserAlreadyExistsException(AppException):
     def __init__(self, email: str):
-        self.email = email
         self.message = f"User with email {email} already exists"
-        self.status_code = 400
-
-    def __str__(self):
-        return self.message
+        super().__init__(self.message, status_code=400)
 
 
-class UserNotFoundException(Exception):
+class UserNotFoundException(AppException):
     def __init__(self):
         self.message = "User not found"
-        self.status_code = 404
-
-    def __str__(self):
-        return self.message
+        super().__init__(self.message, status_code=404)
 
 
-class NoteNotFoundException(Exception):
+class NoteNotFoundException(AppException):
     def __init__(self) -> None:
         self.message = "Note not found"
-        self.status_code = 404
-
-    def __str__(self):
-        return self.message
+        super().__init__(self.message, status_code=404)
 
 
-class TgProfileAlreadyExistsException(Exception):
+class TgProfileAlreadyExistsException(AppException):
     def __init__(self):
         self.message = "The profile is already linked to another user"
-        self.status_code = 400
-
-    def __str__(self):
-        return self.message
+        super().__init__(self.message, status_code=400)
 
 
-class TgProfileNotFoundException(Exception):
+class TgProfileNotFoundException(AppException):
     def __init__(self):
         self.message = "Tg profile not found"
-        self.status_code = 404
-
-    def __str__(self):
-        return self.message
+        super().__init__(self.message, status_code=404)
