@@ -316,7 +316,7 @@ async def process_register_password(message: Message, state: FSMContext):
 
 @dp.message(lambda message: message.text)
 async def echo_message(message: Message):
-    await message.answer(message.text)
+    await message.reply("Нет такой команды!")
 
 
 if __name__ == "__main__":
