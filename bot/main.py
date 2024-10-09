@@ -1,6 +1,11 @@
 import logging
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message
+from aiogram.types import (
+    Message,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    CallbackQuery,
+)
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -198,6 +203,56 @@ async def note_tags_process(message: Message, state: FSMContext):
             )
 
     await state.clear()
+
+
+@dp.message(Command("delete_note"))
+async def delete_note(message: Message):
+    tg_id: int = message.from_user.id
+    async for session in get_async_session():
+        query = select(User).join(TgProfile).where(TgProfile.tg_id == tg_id)
+        result = await session.execute(query)
+        user_db = result.scalar_one_or_none()
+        if user_db is not None:
+            notes: list[Note] = user_db.notes
+            if not notes:
+                await message.answer(
+                    "У вас нет заметок. Чтобы добавить заметку, отправьте команду /add_note"
+                )
+                return
+            kb_buttons = []
+            for note in notes:
+                kb_buttons.append(
+                    InlineKeyboardButton(
+                        text=note.title,
+                        callback_data=f"delete-note-id-{note.id}-user-id-{user_db.id}",
+                    )
+                )
+            await message.answer(
+                "Выберите заметку, которую хотите удалить",
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=[kb_buttons]),
+            )
+        else:
+            await message.answer(
+                "Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, отправив команду /register"
+            )
+
+
+@dp.callback_query(lambda text: text.data.startswith("delete-note-id-"))
+async def delete_note_callback(callback: CallbackQuery):
+    note_id = int(callback.data.split("-")[3])
+    user_id = int(callback.data.split("-")[-1])
+    async for session in get_async_session():
+        note_service = NoteService(session)
+        try:
+            await note_service.delete_note_for_user(user_id, note_id)
+            await callback.message.delete()
+            await callback.message.answer("Заметка успешно удалена")
+        except Exception as e:
+            logger.error(f"Ошибка при удалении заметки: {e}")
+            await callback.message.delete()
+            await callback.message.answer(
+                "Произошла ошибка при удалении заметки. Пожалуйста, попробуйте снова."
+            )
 
 
 @dp.message(Command("link_profile"))
