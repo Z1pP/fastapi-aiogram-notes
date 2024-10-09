@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Literal
 import jwt
 
@@ -13,7 +14,7 @@ REFRESH_TOKEN_TYPE = "refresh"
 
 async def encode_jwt(
     payload: dict[str, Any],
-    private_key_path: str = settings.authjwt.private_key_path,
+    private_key_path: Path = settings.authjwt.private_key_path,
     algorithm: str = settings.authjwt.algorithm,
     expire_minutes: int = settings.authjwt.access_token_expire_minutes,
     expire_timedelta: timedelta | None = None,
@@ -35,7 +36,7 @@ async def encode_jwt(
 
 async def decode_jwt(
     token: str | bytes,
-    public_key_path: str = settings.authjwt.public_key_path,
+    public_key_path: Path = settings.authjwt.public_key_path,
     algorithm: str = settings.authjwt.algorithm,
 ) -> dict[str, Any]:
     public_key = public_key_path.read_text()
