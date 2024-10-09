@@ -9,8 +9,9 @@ from sqlalchemy import select
 from app.core.config import settings
 from app.models import TgProfile
 from app.db.database import get_async_session
-from app.models import User
+from app.models import User, Note
 from app.utils.password import hash_password, verify_password
+from app.services import NoteService
 
 from bot.formater import format_note
 import bot.logging_config
@@ -85,16 +86,21 @@ async def notes_command(message: Message):
                 "Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, отправив команду /register"
             )
             return
-        notes = user_db.notes
+        notes: list[Note] = user_db.notes
         if not notes:
             await message.answer(
                 "У вас нет заметок. Чтобы добавить заметку, отправьте команду /add_note"
             )
             return
 
-        message_text = "Список ваших заметок:\n"
-        for num, note in enumerate(notes, 1):
-            message_text += f"{num}. {note.title}\n" f"{note.description}\n\n"
+        message_text = "Список ваших заметок:\n\n"
+        for note in notes:
+            message_text += (
+                f"Название: {note.title}\n"
+                f"Описание: {note.description}\n"
+                f"Теги: {', '.join(tag.name for tag in note.tags)}\n"
+                "----------------------------------\n"
+            )
         await message.answer(message_text)
 
 
@@ -106,17 +112,49 @@ async def add_note(message: Message, state: FSMContext):
 
 @dp.message(AddNoteState.title)
 async def note_title_process(message: Message, state: FSMContext):
-    await state.update_data(title=message.text)
+    title = message.text.strip()
+
+    if len(title) < 3:
+        await message.answer(
+            "Слишком короткое название. Минимальная длина - 3 символа."
+        )
+        return
+
+    if len(title) > 100:
+        await message.answer(
+            "Слишком длинное название. Максимальная длина - 100 символов."
+        )
+        return
+
+    if title.isdigit():
+        await message.answer("Название не может состоять только из цифр.")
+        return
+
+    await state.update_data(title=title)
     await message.answer("Добавь описание своей заметке")
     await state.set_state(AddNoteState.description)
 
 
 @dp.message(AddNoteState.description)
 async def note_description_process(message: Message, state: FSMContext):
-    description = message.text
+    description = message.text.strip()
+
     if len(description) < 5:
-        await message.answer("Хуета")
+        await message.answer(
+            "Слишком короткое описание. Минимальная длина - 5 символов."
+        )
         return
+
+    if len(description) > 500:
+        await message.answer(
+            "Слишком длинное описание. Максимальная длина - 500 символов."
+        )
+        return
+
+    if description.isdigit():
+        await message.answer("Описание не может состоять только из цифр.")
+        return
+
     await state.update_data(description=description)
     await message.answer("Добавь теги через запятую")
     await state.set_state(AddNoteState.tags)
@@ -124,10 +162,40 @@ async def note_description_process(message: Message, state: FSMContext):
 
 @dp.message(AddNoteState.tags)
 async def note_tags_process(message: Message, state: FSMContext):
-    tags = message.text.split(",")
+    tags = [tag.strip() for tag in message.text.split(",") if tag.strip()]
+
+    if not tags:
+        await message.answer("Пожалуйста, введите хотя бы один тег.")
+        return
+
+    if len(tags) > 5:
+        await message.answer(
+            "Слишком много тегов. Пожалуйста, введите не более 5 тегов."
+        )
+        return
+
+    if any(len(tag) > 20 for tag in tags):
+        await message.answer(
+            "Слишком длинный тег. Максимальная длина тега - 20 символов."
+        )
+        return
+
     await state.update_data(tags=tags)
     formatted_note = format_note(**await state.get_data())
-    await message.answer(formatted_note.model_dump_json())
+
+    async for session in get_async_session():
+        query = select(TgProfile).where(TgProfile.tg_id == message.from_user.id)
+        result = await session.execute(query)
+        tg_profile: TgProfile = result.scalar_one_or_none()
+        note_service = NoteService(session)
+        try:
+            await note_service.create_note_for_user(tg_profile.user_id, formatted_note)
+            await message.answer("Заметка успешно создана")
+        except Exception as e:
+            logger.error(f"Ошибка при создании заметки: {e}")
+            await message.answer(
+                "Произошла ошибка при создании заметки. Пожалуйста, попробуйте снова."
+            )
 
     await state.clear()
 
