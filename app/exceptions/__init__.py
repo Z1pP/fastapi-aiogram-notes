@@ -1,4 +1,5 @@
 from .exceptions import (
+    BaseAppException,
     UserAlreadyExistsException,
     UserNotFoundException,
     TgProfileAlreadyExistsException,
@@ -8,6 +9,7 @@ from .exceptions import (
 
 
 __all__ = [
+    "BaseAppException",
     "UserAlreadyExistsException",
     "UserNotFoundException",
     "TgProfileAlreadyExistsException",
