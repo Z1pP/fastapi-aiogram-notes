@@ -1,6 +1,6 @@
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models.user import User
-from app.schemas.user_schema import UserResponse, UserCreate, UserUpdate
+from app.schemas.user_schema import UserCreate, UserUpdate
 from app.utils.password import hash_password
 from app.repositories import IUserRepository
 
@@ -14,7 +14,7 @@ class UserService:
         if user:
             raise UserAlreadyExistsException(email=email)
 
-    async def create_user(self, user: UserCreate) -> UserResponse:
+    async def create_user(self, user: UserCreate) -> User:
         user_db = await self.user_repository.get_by_email(user.email)
         if user_db:
             raise UserAlreadyExistsException(user.email)
@@ -43,7 +43,7 @@ class UserService:
             raise UserNotFoundException()
         return user
 
-    async def update_user_by_id(self, user_id: int, user: UserUpdate) -> UserResponse:
+    async def update_user_by_id(self, user_id: int, user: UserUpdate) -> User:
         db_user = await self.get_user_by_id(user_id)
 
         update_data = user.model_dump(exclude_unset=True)
