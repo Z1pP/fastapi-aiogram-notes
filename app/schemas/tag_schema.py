@@ -11,3 +11,6 @@ class TagCreate(TagBase):
 
 class TagResponse(TagBase):
     pass
+
+    class Config:
+        from_attributes = True
