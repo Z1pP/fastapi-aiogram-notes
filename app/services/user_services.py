@@ -1,6 +1,6 @@
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models.user import User
-from app.schemas.user_schema import UserCreate, UserUpdate
+from app.schemas.user_schema import UserResponse, UserCreate, UserUpdate
 from app.utils.password import hash_password
 from app.repositories import IUserRepository
 
@@ -14,7 +14,7 @@ class UserService:
         if user:
             raise UserAlreadyExistsException(email=email)
 
-    async def create_user(self, user: UserCreate) -> User:
+    async def create_user(self, user: UserCreate) -> UserResponse:
         user_db = await self.user_repository.get_by_email(user.email)
         if user_db:
             raise UserAlreadyExistsException(user.email)
@@ -25,25 +25,25 @@ class UserService:
             **user.model_dump(exclude="password"), hashed_password=hashed_password
         )
 
-        return await self.user_repository.add(dto_user)
+        return UserResponse.model_validate(await self.user_repository.add(dto_user))
 
-    async def get_users(self) -> list[User]:
+    async def get_users(self) -> list[UserResponse]:
         users = await self.user_repository.get_all()
-        return users
+        return [UserResponse.model_validate(user) for user in users]
 
-    async def get_user_by_id(self, user_id: int) -> User:
+    async def get_user_by_id(self, user_id: int) -> UserResponse:
         user = await self.user_repository.get_by_id(user_id=user_id)
         if user is None:
             raise UserNotFoundException()
-        return user
+        return UserResponse.model_validate(user)
 
-    async def get_user_by_email(self, email: str) -> User:
+    async def get_user_by_email(self, email: str) -> UserResponse:
         user = await self.user_repository.get_by_email(email=email)
         if user is None:
             raise UserNotFoundException()
-        return user
+        return UserResponse.model_validate(user)
 
-    async def update_user_by_id(self, user_id: int, user: UserUpdate) -> User:
+    async def update_user_by_id(self, user_id: int, user: UserUpdate) -> UserResponse:
         db_user = await self.get_user_by_id(user_id)
 
         update_data = user.model_dump(exclude_unset=True)
@@ -61,9 +61,9 @@ class UserService:
         for key, value in update_data.items():
             setattr(db_user, key, value)
 
-        return await self.user_repository.update(db_user)
+        return UserResponse.model_validate(await self.user_repository.update(db_user))
 
     async def delete_user_by_id(self, user_id: int) -> None:
         db_user = await self.get_user_by_id(user_id)
 
-        return await self.user_repository.delete(db_user)
+        await self.user_repository.delete(db_user)
