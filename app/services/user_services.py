@@ -1,6 +1,6 @@
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
-from app.models.user import User
-from app.schemas.user_schema import UserResponse, UserCreate, UserUpdate
+from app.models import User
+from app.schemas import UserResponse, UserCreate, UserUpdate
 from app.utils.password import hash_password
 from app.repositories import IUserRepository
 
