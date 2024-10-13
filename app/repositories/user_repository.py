@@ -1,12 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from fastapi import Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.models import User
-from app.db.database import get_async_session
 
 
 class IUserRepository(ABC):
