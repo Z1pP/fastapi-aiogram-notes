@@ -1,10 +1,9 @@
-from fastapi import HTTPException, status
-
 from app.services import UserService
 from app.schemas import UserCreate, UserResponse, TokenInfo
 from app.utils.password import verify_password
 from app.utils.utils import create_access_token, create_refresh_token
 from app.core.config import settings
+from app.exceptions import InvalidEmailException, InvalidPasswordException
 
 
 class AuthService:
@@ -23,16 +22,8 @@ class AuthService:
                     token_type=settings.authjwt.token_type,
                 )
             else:
-                raise HTTPException(
-                    status_code=status.HTTP_401_UNAUTHORIZED,
-                    detail="Неверный пароль",
-                    headers={"WWW-Authenticate": "Bearer"},
-                )
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Неверная почта",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+                raise InvalidPasswordException()
+        raise InvalidEmailException()
 
     async def refresh_token(self, user: UserResponse) -> TokenInfo:
         access_token = await create_access_token(user)
