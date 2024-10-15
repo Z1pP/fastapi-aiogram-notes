@@ -4,6 +4,8 @@ from sqlalchemy import String, Integer, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
+from app.schemas import UserEntity
+
 from .base import Base
 
 if TYPE_CHECKING:
@@ -35,3 +37,14 @@ class User(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
+
+    def to_entity(self) -> UserEntity:
+        return UserEntity(
+            id=self.id,
+            email=self.email,
+            hashed_password=self.hashed_password,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            notes=self.notes,
+            tg_profile=self.tg_profile,
+        )
