@@ -6,7 +6,12 @@ from app.schemas import (
     TgProfileUpdate,
 )
 from app.services import TgProfileService
-from app.exceptions import *
+from app.exceptions import (
+    TgProfileNotFoundException,
+    TgProfileAlreadyExistsException,
+    UserNotFoundException,
+    UserAlreadyExistsException,
+)
 from app.dependencies import get_tg_profile_service
 
 router = APIRouter(prefix="/tg_profile", tags=["tg_profile"])

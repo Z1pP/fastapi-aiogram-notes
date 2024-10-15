@@ -6,8 +6,9 @@ from fastapi.security import (
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.database import get_async_session
+from app.repositories import SQLAlchemyUserRepository
 from app.schemas import UserResponse
-from app.services import *
+from app.services import UserService, NoteService, TgProfileService, AuthService
 from app.utils.utils import decode_jwt
 
 
@@ -21,7 +22,7 @@ async def get_current_token_payload(
     try:
         payload = await decode_jwt(token)
         return payload
-    except Exception as e:
+    except Exception:
         raise HTTPException(
             status_code=401,
             detail="Invalid token",
@@ -32,7 +33,8 @@ async def get_current_token_payload(
 async def get_user_service(
     session: AsyncSession = Depends(get_async_session),
 ) -> UserService:
-    return UserService(session)
+    user_repository = SQLAlchemyUserRepository(session)
+    return UserService(user_repository)
 
 
 async def get_note_service(

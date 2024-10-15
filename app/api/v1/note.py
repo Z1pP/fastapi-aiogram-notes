@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.exceptions import *
+from app.exceptions import NoteNotFoundException
 from app.schemas import NoteCreate, NoteResponse, NoteUpdate, UserResponse
 from app.services import NoteService
 from app.dependencies import get_note_service, get_current_auth_user

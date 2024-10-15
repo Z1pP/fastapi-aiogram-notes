@@ -15,7 +15,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def login(
     user: UserCreate, auth_service: AuthService = Depends(get_auth_service)
 ):
-    return await auth_service.login(user)
+    return await auth_service.login(user.to_entity())
 
 
 @router.post(

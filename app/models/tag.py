@@ -1,8 +1,6 @@
 from typing import TYPE_CHECKING
-from datetime import datetime
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy.sql import func
 
 from .base import Base
 from .note_tag import NoteTag

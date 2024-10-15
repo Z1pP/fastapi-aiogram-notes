@@ -1,5 +1,4 @@
-from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class TagBase(BaseModel):
@@ -12,3 +11,6 @@ class TagCreate(TagBase):
 
 class TagResponse(TagBase):
     pass
+
+    class Config:
+        from_attributes = True
