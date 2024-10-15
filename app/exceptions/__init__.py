@@ -5,8 +5,8 @@ from .exceptions import (
     TgProfileAlreadyExistsException,
     TgProfileNotFoundException,
     NoteNotFoundException,
-    InvalidPasswordException,
-    InvalidEmailException,
+    InvalidAuthPasswordException,
+    InvalidAuthEmailException,
 )
 
 
@@ -17,6 +17,6 @@ __all__ = [
     "TgProfileAlreadyExistsException",
     "TgProfileNotFoundException",
     "NoteNotFoundException",
-    "InvalidPasswordException",
-    "InvalidEmailException",
+    "InvalidAuthPasswordException",
+    "InvalidAuthEmailException",
 ]
