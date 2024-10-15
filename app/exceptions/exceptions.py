@@ -11,10 +11,13 @@ class BaseAppException(Exception):
 
 
 class BaseAuthException(HTTPException):
-    def __init__(self):
-        self.message = "Invalid password"
+    def __init__(self, detail: str = None, status_code: int = None):
+        self.detail = detail or "Unauthorized user"
         self.headers = {"WWW-Authenticate": "Bearer"}
-        super().__init__(self.message, self.status_code, self.headers)
+        self.status_code = status_code or status.HTTP_401_UNAUTHORIZED
+        super().__init__(
+            status_code=self.status_code, detail=self.detail, headers=self.headers
+        )
 
 
 class UserAlreadyExistsException(BaseAppException):
@@ -47,13 +50,13 @@ class TgProfileNotFoundException(BaseAppException):
         super().__init__(self.message, status_code=status.HTTP_404_NOT_FOUND)
 
 
-class InvalidPasswordException(BaseAuthException):
+class InvalidAuthPasswordException(BaseAuthException):
     def __init__(self):
-        self.message = "Invalid password"
-        super().__init__(self.message, status_code=status.HTTP_401_UNAUTHORIZED)
+        self.detail = "Invalid auth password"
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=self.detail)
 
 
-class InvalidEmailException(BaseAppException):
+class InvalidAuthEmailException(BaseAuthException):
     def __init__(self):
-        self.message = "Invalid email"
-        super().__init__(self.message, status_code=status.HTTP_401_UNAUTHORIZED)
+        self.detail = "Invalid auth email"
+        super().__init__(status_code=status.HTTP_401_UNAUTHORIZED, detail=self.detail)
