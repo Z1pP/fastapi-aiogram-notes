@@ -36,3 +36,12 @@ certs/
 dmypy.json
 dmypy.lock
 .ruff_cache/
+
+
+# tests
+.pytest_cache/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
