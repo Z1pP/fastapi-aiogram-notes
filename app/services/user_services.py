@@ -1,6 +1,6 @@
 from app.exceptions import UserAlreadyExistsException, UserNotFoundException
 from app.models import User
-from app.schemas import UserResponse, UserCreate, UserUpdate
+from app.schemas import UserEntity
 from app.utils.password import hash_password
 from app.repositories import IUserRepository
 
@@ -10,60 +10,84 @@ class UserService:
         self.user_repository = user_repository
 
     async def user_is_exists(self, email: str) -> bool:
-        user = await self.user_repository.get_by_email(email)
+        """
+        Check if user with email already exists
+        """
+        user = await self.user_repository.get_by_email(email=email)
         if user:
             raise UserAlreadyExistsException(email=email)
 
-    async def create_user(self, user: UserCreate) -> UserResponse:
-        user_db = await self.user_repository.get_by_email(user.email)
+    async def create_user(self, user: UserEntity) -> UserEntity:
+        """
+        Create new user in database
+        """
+        user_db = await self.user_repository.get_by_email(email=user.email)
         if user_db:
-            raise UserAlreadyExistsException(user.email)
+            raise UserAlreadyExistsException(email=user.email)
 
-        hashed_password = hash_password(user.password)
+        user.hashed_password = hash_password(user.password)
 
-        dto_user = User(
-            **user.model_dump(exclude="password"), hashed_password=hashed_password
-        )
+        new_user = User(**user.model_dump(exclude="password", exclude_unset=True))
 
-        return UserResponse.model_validate(await self.user_repository.add(dto_user))
+        created_user = await self.user_repository.add(user=new_user)
+        return created_user.to_entity()
 
-    async def get_users(self) -> list[UserResponse]:
+    async def get_users(self) -> list[UserEntity]:
+        """
+        Get all users from database
+        """
         users = await self.user_repository.get_all()
-        return [UserResponse.model_validate(user) for user in users]
+        return [user.to_entity() for user in users]
 
-    async def get_user_by_id(self, user_id: int) -> UserResponse:
+    async def get_user_by_id(self, user_id: int) -> UserEntity:
+        """
+        Get user by id from database
+        """
         user = await self.user_repository.get_by_id(user_id=user_id)
         if user is None:
             raise UserNotFoundException()
-        return UserResponse.model_validate(user)
+        return user.to_entity()
 
-    async def get_user_by_email(self, email: str) -> UserResponse:
+    async def get_user_by_email(self, email: str) -> UserEntity:
+        """
+        Get user by email from database
+        """
         user = await self.user_repository.get_by_email(email=email)
         if user is None:
             raise UserNotFoundException()
-        return UserResponse.model_validate(user)
+        return user.to_entity()
 
-    async def update_user_by_id(self, user_id: int, user: UserUpdate) -> UserResponse:
-        db_user = await self.get_user_by_id(user_id)
+    async def update_user_by_id(self, user_id: int, user: UserEntity) -> UserEntity:
+        """
+        Update user by id from database
+        """
+        db_user = await self.user_repository.get_by_id(user_id)
+        if db_user is None:
+            raise UserNotFoundException()
 
-        update_data = user.model_dump(exclude_unset=True)
+        if user.email:
+            # Check if email is already exists
+            existing_user = await self.user_repository.get_by_email(email=user.email)
+            if existing_user and (existing_user.id != db_user.id):
+                raise UserAlreadyExistsException(email=user.email)
 
-        if "email" in update_data:
-            existing_user = await self.user_repository.get_by_email(
-                email=update_data["email"]
-            )
-            if existing_user and existing_user.id != user_id:
-                raise UserAlreadyExistsException(update_data["email"])
+        if user.password:
+            user.hashed_password = hash_password(user.password)
 
-        if "password" in update_data:
-            update_data["hashed_password"] = hash_password(update_data.pop("password"))
+        updated_data = user.model_dump(exclude={"password"}, exclude_none=True)
 
-        for key, value in update_data.items():
+        for key, value in updated_data.items():
             setattr(db_user, key, value)
 
-        return UserResponse.model_validate(await self.user_repository.update(db_user))
+        updated_user = await self.user_repository.update(user=db_user)
+        return updated_user.to_entity()
 
     async def delete_user_by_id(self, user_id: int) -> None:
-        db_user = await self.get_user_by_id(user_id)
+        """
+        Delete user by id from database
+        """
+        db_user = await self.user_repository.get_by_id(user_id=user_id)
+        if db_user is None:
+            raise UserNotFoundException()
 
         await self.user_repository.delete(db_user)
