@@ -5,13 +5,11 @@ from sqlalchemy.orm import selectinload
 from app.exceptions.exceptions import NoteNotFoundException
 from app.schemas import NoteCreate, NoteResponse, NoteUpdate, TagCreate
 from app.models import Tag, Note
-from app.services import UserService
 
 
 class NoteService:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
-        self.user_service = UserService(self.session)
 
     async def _normalize_tags_name(self, tags: list[TagCreate]) -> list[TagCreate]:
         return [TagCreate(name=tag.name.lower().capitalize()) for tag in tags]
@@ -67,7 +65,7 @@ class NoteService:
 
         return db_note
 
-    async def get_notes_for_user(self, user_id: int) -> list[NoteResponse] | None:
+    async def get_notes_by_user_id(self, user_id: int) -> list[NoteResponse] | None:
         query = (
             select(Note).where(Note.user_id == user_id).options(selectinload(Note.tags))
         )
