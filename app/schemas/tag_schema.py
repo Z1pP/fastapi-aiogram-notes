@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Optional
 
 
 class TagBase(BaseModel):
@@ -6,7 +7,18 @@ class TagBase(BaseModel):
 
 
 class TagCreate(TagBase):
-    pass
+    def to_entity(self) -> "TagEntity":
+        return TagEntity(name=self.name)
+
+
+class TagEntity(TagBase):
+    id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+    def to_response(self) -> "TagResponse":
+        return TagResponse(name=self.name)
 
 
 class TagResponse(TagBase):

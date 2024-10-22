@@ -4,8 +4,9 @@ from sqlalchemy import ForeignKey, String, Integer, Text, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from .base import Base
-from .note_tag import NoteTag
+from app.models.base import Base
+from app.models.note_tag import NoteTag
+from app.schemas import NoteEntity
 
 
 if TYPE_CHECKING:
@@ -31,3 +32,14 @@ class Note(Base):
     tags: Mapped[list["Tag"]] = relationship(
         secondary=NoteTag.__table__, back_populates="notes", lazy="selectin"
     )
+
+    def to_entity(self) -> "NoteEntity":
+        return NoteEntity(
+            id=self.id,
+            user_id=self.user_id,
+            title=self.title,
+            description=self.description,
+            tags=self.tags,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+        )

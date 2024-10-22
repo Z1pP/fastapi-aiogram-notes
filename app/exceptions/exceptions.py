@@ -3,6 +3,7 @@ from fastapi import status, HTTPException
 
 class BaseAppException(Exception):
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR  # default status code
+    message: str = "Internal server error"
 
     def __init__(self, message: str, status_code: int):
         super().__init__(message)
@@ -35,6 +36,12 @@ class UserNotFoundException(BaseAppException):
 class NoteNotFoundException(BaseAppException):
     def __init__(self) -> None:
         self.message = "Note not found"
+        super().__init__(self.message, status_code=status.HTTP_404_NOT_FOUND)
+
+
+class TagNotFoundException(BaseAppException):
+    def __init__(self, name: str):
+        self.message = f"Tag with name {name} not found"
         super().__init__(self.message, status_code=status.HTTP_404_NOT_FOUND)
 
 
