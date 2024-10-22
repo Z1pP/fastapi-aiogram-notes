@@ -38,6 +38,12 @@ class NoteNotFoundException(BaseAppException):
         super().__init__(self.message, status_code=status.HTTP_404_NOT_FOUND)
 
 
+class TagNotFoundException(BaseAppException):
+    def __init__(self, name: str):
+        self.message = f"Tag with name {name} not found"
+        super().__init__(self.message, status_code=status.HTTP_404_NOT_FOUND)
+
+
 class TgProfileAlreadyExistsException(BaseAppException):
     def __init__(self):
         self.message = "The profile is already linked to another user"
