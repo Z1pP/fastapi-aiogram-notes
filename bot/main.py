@@ -194,7 +194,9 @@ async def note_tags_process(message: Message, state: FSMContext):
         tg_profile: TgProfile = result.scalar_one_or_none()
         note_service = NoteService(session)
         try:
-            await note_service.create_note_for_user(tg_profile.user_id, formatted_note)
+            await note_service.create_note_by_user_id(
+                tg_profile.user_id, formatted_note
+            )
             await message.answer("Заметка успешно создана")
         except Exception as e:
             logger.error(f"Ошибка при создании заметки: {e}")
@@ -244,7 +246,7 @@ async def delete_note_callback(callback: CallbackQuery):
     async for session in get_async_session():
         note_service = NoteService(session)
         try:
-            await note_service.delete_note_for_user(user_id, note_id)
+            await note_service.delete_note_by_user_id_and_note_id(user_id, note_id)
             await callback.message.delete()
             await callback.message.answer("Заметка успешно удалена")
         except Exception as e:
