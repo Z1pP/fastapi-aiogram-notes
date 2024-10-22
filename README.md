@@ -39,7 +39,7 @@
 1. Клонируйте репозиторий:
 
 bash
-git clone https://github.com/yourusername/notes-api.git
+https://github.com/Z1pP/fastapi-aiogram-notes.git
 cd notes-api
 
 2. Создайте .env файл:
