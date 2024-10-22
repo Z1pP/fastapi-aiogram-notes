@@ -3,6 +3,7 @@ from fastapi import status, HTTPException
 
 class BaseAppException(Exception):
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR  # default status code
+    message: str = "Internal server error"
 
     def __init__(self, message: str, status_code: int):
         super().__init__(message)
