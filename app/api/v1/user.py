@@ -3,7 +3,13 @@ from fastapi import APIRouter, Depends, HTTPException, Response, status
 from app.exceptions import BaseAppException
 from app.schemas import UserCreate, UserResponse, UserUpdate, UserEntity
 from app.services import UserService
-from app.dependencies import get_user_service, get_current_auth_user
+from app.dependencies import (
+    get_user_service,
+    get_current_auth_user,
+    get_all_users_use_case,
+    get_user_by_id_use_case,
+)
+from app.usecases.user import GetAllUsersUseCase, GetUserByIdUseCase
 
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -11,11 +17,10 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 @router.get("/", response_model=list[UserResponse], status_code=status.HTTP_200_OK)
 async def get_users(
-    user_service: UserService = Depends(get_user_service),
+    usecase: GetAllUsersUseCase = Depends(get_all_users_use_case),
 ):
     try:
-        users = await user_service.get_users()
-        return [UserEntity.to_response(user) for user in users]
+        return await usecase.execute()
     except BaseAppException as e:
         raise HTTPException(status_code=e.status_code, detail=str(e))
 
@@ -33,11 +38,10 @@ async def create_user(
 
 @router.get("/{user_id}", response_model=UserResponse, status_code=status.HTTP_200_OK)
 async def get_user_by_id(
-    user_id: int, user_service: UserService = Depends(get_user_service)
+    user_id: int, usecase: GetUserByIdUseCase = Depends(get_user_by_id_use_case)
 ):
     try:
-        user = await user_service.get_user_by_id(user_id)
-        return UserEntity.to_response(user)
+        return await usecase.execute(user_id=user_id)
     except BaseAppException as e:
         raise HTTPException(status_code=e.status_code, detail=str(e))
 
