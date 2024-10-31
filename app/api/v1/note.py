@@ -24,10 +24,10 @@ router = APIRouter(prefix="/notes", tags=["notes"])
 @router.get("/", response_model=list[NoteResponse], status_code=status.HTTP_200_OK)
 async def get_notes(
     user: UserEntity = Depends(get_current_auth_user),
-    get_user_notes_use_case: GetUserNotesUseCase = Depends(get_user_notes_use_case),
+    usecase: GetUserNotesUseCase = Depends(get_user_notes_use_case),
 ):
     try:
-        return await get_user_notes_use_case.execute(user_id=user.id)
+        return await usecase.execute(user_id=user.id)
     except BaseAppException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -36,14 +36,10 @@ async def get_notes(
 async def create_note(
     note: NoteCreate,
     user: UserEntity = Depends(get_current_auth_user),
-    create_note_for_user_use_case: CreateNoteForUserUseCase = Depends(
-        create_note_for_user_use_case
-    ),
+    usecase: CreateNoteForUserUseCase = Depends(create_note_for_user_use_case),
 ):
     try:
-        return await create_note_for_user_use_case.execute(
-            user_id=user.id, note=note.to_entity()
-        )
+        return await usecase.execute(user_id=user.id, note=note.to_entity())
     except BaseAppException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -52,14 +48,10 @@ async def create_note(
 async def delete_note(
     note_id: int,
     user: UserEntity = Depends(get_current_auth_user),
-    delete_note_for_user_use_case: DeleteNoteForUserUseCase = Depends(
-        delete_note_for_user_use_case
-    ),
+    usecase: DeleteNoteForUserUseCase = Depends(delete_note_for_user_use_case),
 ):
     try:
-        return await delete_note_for_user_use_case.execute(
-            user_id=user.id, note_id=note_id
-        )
+        return await usecase.execute(user_id=user.id, note_id=note_id)
     except BaseAppException as e:
         raise HTTPException(status_code=e.status_code, detail=e.message)
 
@@ -69,12 +61,10 @@ async def update_note(
     note_id: int,
     note: NoteUpdate,
     user: UserEntity = Depends(get_current_auth_user),
-    update_note_for_user_use_case: UpdateNoteForUserUseCase = Depends(
-        update_note_for_user_use_case
-    ),
+    usecase: UpdateNoteForUserUseCase = Depends(update_note_for_user_use_case),
 ):
     try:
-        return await update_note_for_user_use_case.execute(
+        return await usecase.execute(
             user_id=user.id, note_id=note_id, note=note.to_entity()
         )
     except BaseAppException as e:
@@ -85,8 +75,6 @@ async def update_note(
 async def get_notes_by_tags(
     tags: list[str],
     user: UserEntity = Depends(get_current_auth_user),
-    get_notes_by_tags_use_case: GetNotesByTagsUseCase = Depends(
-        get_notes_by_tags_use_case
-    ),
+    usecase: GetNotesByTagsUseCase = Depends(get_notes_by_tags_use_case),
 ):
-    return await get_notes_by_tags_use_case.execute(user_id=user.id, tags=tags)
+    return await usecase.execute(user_id=user.id, tags=tags)
