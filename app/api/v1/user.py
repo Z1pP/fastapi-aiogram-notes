@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.exceptions import BaseAppException
 from app.schemas import UserCreate, UserResponse, UserUpdate
@@ -17,13 +17,16 @@ from app.usecases.user import (
     UpdateUserDataUseCase,
     DeleteUserUseCase,
 )
+from app.core.rate_limit import limiter
 
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
 @router.get("/", response_model=list[UserResponse], status_code=status.HTTP_200_OK)
+@limiter
 async def get_users(
+    request: Request,
     usecase: GetAllUsersUseCase = Depends(get_all_users_use_case),
 ):
     try:
