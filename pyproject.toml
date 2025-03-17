@@ -6,7 +6,7 @@ authors = ["Z1pP <maxm_99@mail.ru>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "3.12"
+python = ">=3.12,<4.0"  # Изменено на ">=3.12,<4.0"
 fastapi = "^0.114.2"
 sqlalchemy = "^2.0.34"
 asyncpg = "^0.29.0"
@@ -19,11 +19,11 @@ psycopg2-binary = "^2.9.9"
 pydantic = {extras = ["email"], version = "^2.9.2"}
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 mypy = "^1.11.2"
-slowapi = "^0.1.9"
 redis = "^5.1.1"
 aiogram = "^3.13.1"
 ruff = "^0.6.9"
-
+pytest = "^8.3.4"
+httpx = "^0.28.1"
 
 [build-system]
 requires = ["poetry-core"]
